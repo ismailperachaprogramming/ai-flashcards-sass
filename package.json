@@ -21,7 +21,7 @@
     "react-dom": "^18",
     "sill": "^0.0.4",
     "stripe": "^16.7.0",
-    "swr": "^1.1.0"
+    "swr": "^2.2.5"
   },
   "devDependencies": {
     "eslint": "^8",
