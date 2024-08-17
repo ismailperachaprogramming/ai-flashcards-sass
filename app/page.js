@@ -20,8 +20,8 @@ export default function Home() {
             <Toolbar>
               <Typography variant="h6" style= {{flexGrow:1}} > Flashcard SaaS</Typography>
               <SignedOut>
-                <Button color= "inherit">Login</Button>
-                <Button color= "inherit">Sign Up</Button>
+                <Button color= "inherit" href="/sign-in">Login</Button>
+                <Button color= "inherit" href="/sign-up">Sign Up</Button>
               </SignedOut>
               <SignedIn>
                 <UserButton />

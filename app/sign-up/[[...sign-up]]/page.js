@@ -1,8 +1,8 @@
-import {ClerkProvider, SignedIn, SignedOut, SignIn} from "@clerk/nextjs";
+import {ClerkProvider, SignedIn, SignedOut, SignIn, SignUp } from "@clerk/nextjs";
 import {AppBar, Box, Button, Container, Toolbar, Typography} from '@mui/material'
 import Link from 'next/link'
 
-export default function SignInPage() {
+export default function SignUpPage() {
     return (
         <ClerkProvider>
             <Container maxWidth="100vw">
@@ -32,8 +32,8 @@ export default function SignInPage() {
                     alignItems="center"
                     justifyContent="center"
                 >
-                <Typography variant= "h4">Sign In</Typography>
-                <SignIn />
+                <Typography variant= "h4">Sign Up</Typography>
+                <SignUp />
                 </Box>
             </Container>
         </ClerkProvider>
