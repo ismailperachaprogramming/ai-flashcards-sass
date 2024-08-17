@@ -108,7 +108,7 @@ export default function Home() {
                   Unlimited flashcard and storage, and priority support.
                 </Typography>
                 <Button variant = "contained" color = "primary" sx={{mt: 2}}> 
-                  Choose basic
+                  Choose pro
                 </Button>
                 </Box>
                 </Grid>
