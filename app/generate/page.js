@@ -3,7 +3,8 @@ import { Grid, Box, Button, Card, CardActionArea, CardContent, Container, Dialog
 import { useUser } from '@clerk/nextjs'
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { writeBatch } from 'firebase/firestore'
+import { doc, collection, setDoc, getDoc, writeBatch } from 'firebase/firestore'
+import { db } from "@/firebase"
 
 export default function Generate() {
     const { isLoaded, isSignedIn, user } = useUser()
@@ -65,7 +66,7 @@ export default function Generate() {
         const colRef = collection(userDocRef, name)
         flashcards.forEach((flashcard) => {
             const cardDocRef = doc(colRef)
-            batch.set(cardDocRef, flaschard)
+            batch.set(cardDocRef, flashcard)
         })
         
         await batch.commit()
@@ -191,8 +192,7 @@ export default function Generate() {
                         value={name}
                         onClick={(e) => setName(e.target.value)}
                         variant="outlined"
-                    >
-                    </TextField>
+                    />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
