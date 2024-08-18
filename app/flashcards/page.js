@@ -1,16 +1,20 @@
 'use client'
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
-import { collection, CollectionReference, doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, CollectionReference, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useRouter } from "next/navigation";
-import { Card, CardActionArea, CardContent, Container, Grid, Typography, IconButton, Menu, MenuItem } from "@mui/material";
+import { Button, Card, CardActionArea, CardContent, Container, Grid, Typography, IconButton, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField } from "@mui/material";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 export default function Flashcards() {
     const {isLoaded, isSignedIn, user} = useUser()
     const [flashcards, setFlashcards] = useState([])
     const [menuAnchor, setMenuAnchor] = useState(Array(flashcards.length).fill(null));
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [selectedFlashcard, setSelectedFlashcard] = useState(null);
+    const [newName, setNewName] = useState('');
     const router = useRouter()
 
     useEffect(() => {
@@ -44,18 +48,53 @@ export default function Flashcards() {
         setMenuAnchor(newMenuAnchor);
     };
     
-    const handleMenuClose = (index) => {
+    const handleMenuClose = (event, index) => {
+        event.stopPropagation();
         const newMenuAnchor = [...menuAnchor];
         newMenuAnchor[index] = null;
         setMenuAnchor(newMenuAnchor);
     };
     
-    const handleEditName = (name) => {
-        // Add code for editing the name of the flashcard set
+    const handleEditName = (event, flashcard) => {
+        event.stopPropagation();
+        setSelectedFlashcard(flashcard);
+        setNewName(flashcard.name);
+        setEditDialogOpen(true);
     };
     
-    const handleDelete = (name) => {
-        // Add code for deleting the flashcard set
+    const handleDelete = (event, flashcard) => {
+        event.stopPropagation();
+        setSelectedFlashcard(flashcard);
+        setDeleteDialogOpen(true);
+    };
+
+    const saveEditedName = async () => {
+        if (!newName || !selectedFlashcard) return;
+        
+        const updatedFlashcards = flashcards.map(flashcard => {
+            if (flashcard.name === selectedFlashcard.name) {
+                return { ...flashcard, name: newName };
+            }
+            return flashcard;
+        });
+
+        const docRef = doc(collection(db, 'users'), user.id);
+        await updateDoc(docRef, { flashcards: updatedFlashcards });
+
+        setFlashcards(updatedFlashcards);
+        setEditDialogOpen(false);
+    };
+
+    const confirmDelete = async () => {
+        if (!selectedFlashcard) return;
+
+        const updatedFlashcards = flashcards.filter(flashcard => flashcard.name !== selectedFlashcard.name);
+
+        const docRef = doc(collection(db, 'users'), user.id);
+        await updateDoc(docRef, { flashcards: updatedFlashcards });
+
+        setFlashcards(updatedFlashcards);
+        setDeleteDialogOpen(false);
     };
 
     return (
@@ -85,10 +124,10 @@ export default function Flashcards() {
                                         id={`menu-${index}`}
                                         anchorEl={menuAnchor[index]}
                                         open={Boolean(menuAnchor[index])}
-                                        onClose={() => handleMenuClose(index)}
+                                        onClose={(event) => handleMenuClose(event, index)}
                                     >
-                                        <MenuItem onClick={() => handleEditName(flashcard.name)}>Edit Name</MenuItem>
-                                        <MenuItem onClick={() => handleDelete(flashcard.name)}>Delete</MenuItem>
+                                        <MenuItem onClick={(event) => handleEditName(event, flashcard.name)}>Edit Name</MenuItem>
+                                        <MenuItem onClick={(event) => handleDelete(event, flashcard.name)}>Delete</MenuItem>
                                     </Menu>
                                 </CardContent>
                             </CardActionArea>
@@ -96,6 +135,43 @@ export default function Flashcards() {
                     </Grid>
                 ))}
             </Grid>
+
+            {/* Edit Name Dialog */}
+            <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
+                <DialogTitle>Edit Flashcard Set Name</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Enter a new name for the flashcard set.
+                    </DialogContentText>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="New Name"
+                        type="text"
+                        fullWidth
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+                    <Button onClick={saveEditedName} color="primary">Save</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+                <DialogTitle>Delete Flashcard Set</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete the flashcard set "{selectedFlashcard?.name}"? This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+                    <Button onClick={confirmDelete} color="error">Delete</Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     )
 }
