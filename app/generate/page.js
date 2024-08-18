@@ -190,7 +190,7 @@ export default function Generate() {
                         type="text"
                         fullWidth
                         value={name}
-                        onClick={(e) => setName(e.target.value)}
+                        onChange={(e) => setName(e.target.value)}
                         variant="outlined"
                     />
                 </DialogContent>
