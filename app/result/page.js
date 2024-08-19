@@ -38,6 +38,10 @@ const ResultPage = ()=> {
         fetchCheckoutSession()
 
     }, [session_id])
-
+    finally{
+        setLoading(false)
+    }
 
 }
+
+
