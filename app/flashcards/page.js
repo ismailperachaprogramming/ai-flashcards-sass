@@ -1,67 +1,65 @@
 'use client'
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
-import { collection, CollectionReference, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDocs, setDoc, deleteDoc, updateDoc, onSnapshot } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { Button, Card, CardActionArea, CardContent, Container, Grid, Typography, IconButton, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField } from "@mui/material";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 export default function Flashcards() {
-    const {isLoaded, isSignedIn, user} = useUser()
-    const [flashcards, setFlashcards] = useState([])
+    const { isLoaded, isSignedIn, user } = useUser();
+    const [flashcards, setFlashcards] = useState([]);
     const [menuAnchor, setMenuAnchor] = useState(Array(flashcards.length).fill(null));
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [selectedFlashcard, setSelectedFlashcard] = useState(null);
     const [newName, setNewName] = useState('');
-    const router = useRouter()
+    const router = useRouter();
 
     useEffect(() => {
-        async function getFlashcards() {
-            if (!user) return
-            const docRef = doc(collection(db, 'users'), user.id)
-            const docSnap = await getDoc(docRef)
+        if (!user) return;
 
+        const docRef = doc(collection(db, 'users'), user.id);
+        const unsubscribe = onSnapshot(docRef, (docSnap) => {
             if (docSnap.exists()) {
-                const collections = docSnap.data().flashcards || []
-                setFlashcards(collections)
-            } else {
-                await setDoc(docRef, {flashcards: []})
+                const collections = docSnap.data().flashcards || [];
+                setFlashcards(collections);
             }
-        }
-        getFlashcards()
-    }, [user])
+        });
+
+        return () => unsubscribe();
+    }, [user]);
 
     if (!isLoaded || !isSignedIn) {
-        return <></>
+        return <></>;
     }
 
     const handleCardClick = (id) => {
-        router.push(`/flashcard?id=${id}`)
-    }
-    
+        router.push(`/flashcard?id=${id}`);
+    };
+
     const handleMenuClick = (event, index) => {
         event.stopPropagation();
         const newMenuAnchor = [...menuAnchor];
         newMenuAnchor[index] = event.currentTarget;
         setMenuAnchor(newMenuAnchor);
     };
-    
+
     const handleMenuClose = (event, index) => {
         event.stopPropagation();
         const newMenuAnchor = [...menuAnchor];
         newMenuAnchor[index] = null;
         setMenuAnchor(newMenuAnchor);
     };
-    
+
     const handleEditName = (event, flashcard) => {
         event.stopPropagation();
         setSelectedFlashcard(flashcard);
         setNewName(flashcard.name);
         setEditDialogOpen(true);
     };
-    
+
     const handleDelete = (event, flashcard) => {
         event.stopPropagation();
         setSelectedFlashcard(flashcard);
@@ -70,7 +68,22 @@ export default function Flashcards() {
 
     const saveEditedName = async () => {
         if (!newName || !selectedFlashcard) return;
-        
+
+        const docRef = doc(collection(db, 'users'), user.id);
+        const oldCollectionRef = collection(docRef, selectedFlashcard.name);
+        const newCollectionRef = collection(docRef, newName);
+
+        const oldDocsSnapshot = await getDocs(oldCollectionRef);
+
+        for (const oldDoc of oldDocsSnapshot.docs) {
+            const newDocRef = doc(newCollectionRef, oldDoc.id);
+            await setDoc(newDocRef, oldDoc.data());
+        }
+
+        for (const oldDoc of oldDocsSnapshot.docs) {
+            await deleteDoc(doc(oldCollectionRef, oldDoc.id));
+        }
+
         const updatedFlashcards = flashcards.map(flashcard => {
             if (flashcard.name === selectedFlashcard.name) {
                 return { ...flashcard, name: newName };
@@ -78,7 +91,6 @@ export default function Flashcards() {
             return flashcard;
         });
 
-        const docRef = doc(collection(db, 'users'), user.id);
         await updateDoc(docRef, { flashcards: updatedFlashcards });
 
         setFlashcards(updatedFlashcards);
@@ -88,9 +100,15 @@ export default function Flashcards() {
     const confirmDelete = async () => {
         if (!selectedFlashcard) return;
 
-        const updatedFlashcards = flashcards.filter(flashcard => flashcard.name !== selectedFlashcard.name);
-
         const docRef = doc(collection(db, 'users'), user.id);
+        const collectionRef = collection(docRef, selectedFlashcard.name);
+
+        const docsSnapshot = await getDocs(collectionRef);
+        for (const doc of docsSnapshot.docs) {
+            await deleteDoc(doc.ref);
+        }
+
+        const updatedFlashcards = flashcards.filter(flashcard => flashcard.name !== selectedFlashcard.name);
         await updateDoc(docRef, { flashcards: updatedFlashcards });
 
         setFlashcards(updatedFlashcards);
@@ -126,8 +144,8 @@ export default function Flashcards() {
                                         open={Boolean(menuAnchor[index])}
                                         onClose={(event) => handleMenuClose(event, index)}
                                     >
-                                        <MenuItem onClick={(event) => handleEditName(event, flashcard.name)}>Edit Name</MenuItem>
-                                        <MenuItem onClick={(event) => handleDelete(event, flashcard.name)}>Delete</MenuItem>
+                                        <MenuItem onClick={(event) => handleEditName(event, flashcard)}>Edit Name</MenuItem>
+                                        <MenuItem onClick={(event) => handleDelete(event, flashcard)}>Delete</MenuItem>
                                     </Menu>
                                 </CardContent>
                             </CardActionArea>
@@ -173,5 +191,5 @@ export default function Flashcards() {
                 </DialogActions>
             </Dialog>
         </Container>
-    )
+    );
 }
