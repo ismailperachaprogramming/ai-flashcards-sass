@@ -8,11 +8,11 @@ import { db } from "@/firebase"
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import Link from 'next/link'
 
-// Define the royal purple theme
+
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#7851A9', // Royal Purple
+      main: '#7851A9', 
     },
     secondary: {
       main: '#f1f1f1',
