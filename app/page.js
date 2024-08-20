@@ -58,13 +58,16 @@ export default function Home() {
         <Box textAlign="center" sx={{ my: 4 }}>
           <Typography variant="h2" fontWeight="bold" gutterBottom>
             Welcome to Flashcard SaaS
-          </Typography>
           <Typography variant="h5" color="textSecondary">
             The easiest way to create flashcards from your text.
           </Typography>
           <Button variant="contained" sx={{ bgcolor: '#5e3ea1', mt: 4, py: 1.5, px: 5 }} href='/generate'>
             Get Started
           </Button>
+          <Button variant="contained" sx={{ bgcolor: '#5e3ea1', mt: 4, py: 1.5, px: 5 }} href='/flashcards'>
+          See My Flashcards
+          </Button>
+
         </Box>
 
         <Box sx={{ my: 6 }}>
