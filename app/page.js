@@ -25,7 +25,7 @@ export default function Home() {
     }
 
     const stripe = await getStripe()
-    const {error} = await stripe.redirectToCheckout({
+    const { error } = await stripe.redirectToCheckout({
       sessionId: checkoutSessionJson.id,
     })
 
@@ -36,25 +36,26 @@ export default function Home() {
 
   return (
     <CustomSWRConfig>
-      <Container maxWidth="xl" sx={{ bgcolor: '#f0f4f8', minHeight: '100vh', py: 5 }}>
-        <Head>
-          <title>Flashcard SaaS</title>
-          <meta name="description" content="Create flashcards from your text" />
-        </Head>
+      <Head>
+        <title>Flashcard SaaS</title>
+        <meta name="description" content="Create flashcards from your text" />
+      </Head>
 
-        <AppBar position="static" sx={{ bgcolor: '#5e3ea1', boxShadow: 'none', mb: 4 }}>
-          <Toolbar>
-            <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold' }}>Flashcard SaaS</Typography>
-            <SignedOut>
-              <Button color="inherit" href="/sign-in">Login</Button>
-              <Button color="inherit" href="/sign-up">Sign Up</Button>
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-          </Toolbar>
-        </AppBar>
+      {/* AppBar placed outside of the Container to extend its width */}
+      <AppBar position="static" sx={{ bgcolor: '#5e3ea1', boxShadow: 'none' }}>
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold' }}>Flashcard SaaS</Typography>
+          <SignedOut>
+            <Button color="inherit" href="/sign-in">Login</Button>
+            <Button color="inherit" href="/sign-up">Sign Up</Button>
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
+        </Toolbar>
+      </AppBar>
 
+      <Container maxWidth="xl" sx={{ bgcolor: '#f0f4f8', minHeight: '100vh', py: 0 }}>
         <Box textAlign="center" sx={{ my: 4 }}>
           <Typography variant="h2" fontWeight="bold" gutterBottom>
             Welcome to Flashcard SaaS
