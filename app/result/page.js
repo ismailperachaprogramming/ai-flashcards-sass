@@ -30,7 +30,8 @@ const ResultPage = () => {
                 }
             }
             catch (err) {
-                setError('An error occured')
+                console.log(err)
+                setError('An error occurred')
             }
             finally {
                 setLoading(false)
