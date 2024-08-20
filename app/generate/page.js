@@ -156,8 +156,6 @@ export default function Generate() {
                               position: 'relative',
                               width: '100%',
                               height: '200px',
-                              boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2)',
-                              transform: flipped[index] ? 'rotateY(180deg)' : 'rotateY(0deg)',
                             },
                             '& > div > div': {
                               position: 'absolute',
@@ -170,29 +168,34 @@ export default function Generate() {
                               padding: 2,
                               boxSizing: 'border-box',
                               backgroundColor: '#f1f1f1',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              wordWrap: 'break-word',
                             },
-                            '& > div > div:nth-of-type(2)': {
+                            '& > div > .back': {
                               transform: 'rotateY(180deg)',
+                              backgroundColor: '#f1f1f1',
+                              color: '#333',
                             },
                           }}
                         >
-                          <div>
-                            <div>
+                          <div style={{ transform: flipped[index] ? 'rotateY(180deg)' : 'rotateY(0deg)' }}>
+                            <div className="front">
                               <Typography
                                 variant="h6"
                                 component="div"
                                 color="primary"
-                                sx={{ fontWeight: 'bold' }}
+                                sx={{ fontWeight: 'bold', textAlign: 'center' }}
                               >
                                 {flashcard.front}
                               </Typography>
                             </div>
-                            <div>
+                            <div className="back">
                               <Typography
                                 variant="h6"
                                 component="div"
-                                color="secondary"
-                                sx={{ fontWeight: 'bold' }}
+                                color="primary"
+                                sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: '0.875rem' }} // Small font size
                               >
                                 {flashcard.back}
                               </Typography>
