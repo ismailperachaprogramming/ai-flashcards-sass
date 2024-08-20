@@ -95,19 +95,19 @@ export default function Generate() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Container maxWidth="md">
-        {/* Navbar */}
-        <AppBar position="static" sx={{ bgcolor: '#7851A9', mb: 4 }}>
-          <Toolbar>
-            <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-              Flashcard Generator
-            </Typography>
-            <Button color="inherit" component={Link} href="/">
-              Home
-            </Button>
-          </Toolbar>
-        </AppBar>
+      {/* Navbar - Full Width */}
+      <AppBar position="static" sx={{ bgcolor: '#7851A9', mb: 4 }}>
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
+            Flashcard Generator
+          </Typography>
+          <Button color="inherit" component={Link} href="/">
+            Home
+          </Button>
+        </Toolbar>
+      </AppBar>
 
+      <Container maxWidth="md">
         {/* Generate Flashcards Section */}
         <Box sx={{ mt: 6, mb: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Typography variant="h4" gutterBottom color="primary" sx={{ fontWeight: 'bold' }}>
